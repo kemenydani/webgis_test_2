@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>OSGIS App</title>
+
+	<!-- Bootstrap  -->
+	<link href="Includes/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<!-- OpenLayers 3  -->
+	<link href="Includes/plugins/ol3/ol.css" rel="stylesheet">
+	<!-- Base css  -->
+	<link href="Includes/layout/css/style.css" rel="stylesheet">
+
+	<!-- jQuery  -->
+	<script type="text/javascript" src="Includes/plugins/jquery/jquery-3.1.1.js"></script>
+	<!-- OpenLayers 3  -->
+	<script type="text/javascript" src="Includes/plugins/ol3/ol.js"></script>
+	<!-- Turf  -->
+	<script type="text/javascript" src="Includes/plugins/turf/turf.min.js"></script>
+	<!-- Bootstrap  -->
+	<script type="text/javascript" src="Includes/plugins/bootstrap/js/bootstrap.js"></script>
+
+    </head>
+    <body>
+
+	<div id="map">
+	    <!-- The map area comes here -->
+	</div>
+
+	<script type="text/javascript">
+
+	    // STYLES //
+
+	    var image = new ol.style.Circle({
+		radius: 2,
+		fill: null,
+		stroke: new ol.style.Stroke({color: 'red', width: 1})
+	    });
+
+	    var styles = {
+		
+		'Point': [new ol.style.Style({
+		    image: image
+		})],
+	    
+		'LineString': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'green',
+			width: 1
+		    })
+		})],
+	    
+		'MultiLineString': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'green',
+			width: 1
+		    })
+		})],
+
+		'MultiPoint': [new ol.style.Style({
+		    image: image
+		})],
+
+		'MultiPolygon': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'yellow',
+			width: 1
+		    }),
+		    fill: new ol.style.Fill({
+			color: 'rgba(255, 255, 0, 0.4)'
+		    })
+		})],
+
+		'Polygon': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'blue',
+			lineDash: [4],
+			width: 3
+		    }),
+		    fill: new ol.style.Fill({
+			color: 'rgba(0, 0, 255, 0.1)'
+		    })
+		})],
+
+		'GeometryCollection': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'magenta',
+			width: 2
+		    }),
+		    fill: new ol.style.Fill({
+			color: 'magenta'
+		    }),
+		    image: new ol.style.Circle({
+			radius: 10,
+			fill: null,
+			stroke: new ol.style.Stroke({
+			  color: 'magenta'
+			})
+		    })
+		})],
+
+		'Circle': [new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 2
+		    }),
+		    fill: new ol.style.Fill({
+			color: 'rgba(255,0,0,0.2)'
+		    })
+		})]
+
+	    };
+
+	    // STYLE CREATIN FUNCTION //
+
+	    var styleFunction = function(feature, resolution) {
+	      return styles[feature.getGeometry().getType()];
+	    };
+
+	    // SOURCE CREATION //
+
+	    var poiSource = new ol.source.Vector({
+		url: 'Data/json/ka_poi.geojson',
+		format: new ol.format.GeoJSON()
+	    });
+
+	    var railwaysSource = new ol.source.Vector({
+		url: 'Data/json/ka_railways.geojson',
+		format: new ol.format.GeoJSON()
+	    });
+	    
+	    var placesSource = new ol.source.Vector({
+		url: 'Data/json/ka_places.geojson',
+		format: new ol.format.GeoJSON()
+	    });
+
+	    // LAYER CREATION //
+	    
+	    var poiLayer = new ol.layer.Vector({
+		source: poiSource,
+		style: styleFunction
+	    });
+	    
+	    var railwaysLayer = new ol.layer.Vector({
+		source: railwaysSource,
+		style: styleFunction
+	    });
+	    
+	    var placesLayer = new ol.layer.Vector({
+		source: placesSource,
+		style: styleFunction
+	    });
+
+	    var osmLayer = new ol.layer.Tile({
+		source: new ol.source.OSM()
+	    });
+
+	    // INIT THE MAP //
+	    
+	    var map = new ol.Map({
+		layers: [osmLayer, placesLayer, railwaysLayer, poiLayer],
+		target: 'map',
+		view: new ol.View({
+		    projection : 'EPSG:3857',
+		    center: ol.proj.transform([8.6, 49], 'EPSG:4326', 'EPSG:3857'),
+		    zoom: 9
+		})
+	    });
+
+	</script>
+	
+    </body>
+</html>
